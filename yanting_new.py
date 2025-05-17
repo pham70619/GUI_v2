@@ -14,10 +14,10 @@ window.title("classifier")
 window.geometry("750x480")
 
 # 轉盤跟夾抓控制板
-arduino1 = serial.Serial(port='/dev/ttyACM1', baudrate=115200, timeout=1)
+arduino1 = serial.Serial(port='COM6', baudrate=115200, timeout=1)
 time.sleep(2)
 # 住機構控制板
-arduino2 = serial.Serial(port='/dev/ttyACM0', baudrate=115200, timeout=1)
+arduino2 = serial.Serial(port='COM7', baudrate=115200, timeout=1)
 time.sleep(2)
 
 main_frame = tk.Frame(window, bg= "#83A6CE")
