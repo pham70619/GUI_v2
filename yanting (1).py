@@ -13,7 +13,11 @@ window = tk.Tk()
 window.title("classifier")
 window.geometry("750x480")
 
-arduino = serial.Serial(port='COM3', baudrate=115200, timeout=1)
+# 轉盤跟夾抓控制板
+arduino1 = serial.Serial(port='COM6', baudrate=115200, timeout=1)
+time.sleep(2)
+# 住機構控制板
+arduino2 = serial.Serial(port='COM7', baudrate=115200, timeout=1)
 time.sleep(2)
 
 main_frame = tk.Frame(window, bg= "#83A6CE")
@@ -85,17 +89,19 @@ status_label_frame.grid_rowconfigure((0, 1), weight=1) #一行
 
 # #start按鈕函數
 def send_start():
-     arduino.write(b'START\n')  # 傳送 start 指令
+     arduino2.write(b'START\n')  # 傳送 start 指令
      print("已傳送指令：start")
     
      # 可選：顯示 Arduino 回傳的資料
-     response = arduino.readline().decode().strip()
+     response = arduino1.readline().decode().strip()
      print("Arduino 回應：", response)
 def send_home():
-    arduino.write(b'HOME\n')
+    arduino1.write(b'HOME\n')
     print("已送出指令 HOME")
 
-    response = arduino.readline().decode().strip()
+    arduino2.write(b'HOME\n')
+
+    response = arduino1.readline().decode().strip()
     print("Arduino 回應:", response)
 #Control
 #按鍵建立函數================================================================
