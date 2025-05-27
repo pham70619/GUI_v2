@@ -5,7 +5,8 @@ from tkinter import Label
 from tkinter import *
 import serial
 import time
-
+from ultralytics import YOLO
+import cv2
 
 
 #視窗設定
