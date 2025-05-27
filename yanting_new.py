@@ -7,6 +7,7 @@ import serial
 import time
 from ultralytics import YOLO
 import cv2
+from PIL import Image, ImageTk
 
 
 #視窗設定
@@ -14,12 +15,18 @@ window = tk.Tk()
 window.title("classifier")
 window.geometry("750x480")
 
+paperTube = YOLO("papertube.pt")
 # 轉盤跟夾抓控制板
-arduino1 = serial.Serial(port='COM6', baudrate=115200, timeout=1)
+# arduino1 = serial.Serial(port='COM6', baudrate=115200, timeout=1)
 time.sleep(2)
 # 住機構控制板
-arduino2 = serial.Serial(port='COM7', baudrate=115200, timeout=1)
+# arduino2 = serial.Serial(port='COM7', baudrate=115200, timeout=1)
 time.sleep(2)
+
+# 定義影像尺寸
+cap = cv2.VideoCapture(0)
+# cap.set(3, 160)
+# cap.set(4, 120)
 
 main_frame = tk.Frame(window, bg= "#83A6CE")
 main_frame.pack(fill= "both", expand=True)
@@ -56,7 +63,30 @@ result_label_frame.pack(fill="both",expand=True)
 status_label_frame = tk.LabelFrame(result_label_frame, text="Status",  background="#83A6CE")
 status_label_frame.grid(row=2, rowspan=2, column=0, columnspan= 3, padx=10, pady=10, sticky="nsew")
 
+image_label_frame.grid_propagate(False)
 
+# 影像LABEL
+image_label = Label(image_label_frame, text="")
+image_label.pack(fill="both",expand=True)
+
+# 影像處理
+def update_frame():
+    ret, frame = cap.read()
+
+    if ret:
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+        img = Image.fromarray(frame)
+
+        img = img.resize((320, 240))
+
+        imgtk = ImageTk.PhotoImage(image=img)
+
+        image_label.configure(image=imgtk)
+        image_label.imgtk = imgtk
+
+        current_frame = frame
+    window.after(100, update_frame)
 
 #格子分割============================================================
 
@@ -89,28 +119,29 @@ status_label_frame.grid_columnconfigure((0, 1), weight=1) #兩列
 status_label_frame.grid_rowconfigure((0, 1), weight=1) #一行
 
 # #start按鈕函數
-def send_start():
-     arduino2.write(b'START\n')  # 傳送 start 指令
-     print("已傳送指令：start")
+# def send_start():
+#      arduino2.write(b'START\n')  # 傳送 start 指令
+#      print("已傳送指令：start")
     
-     # 可選：顯示 Arduino 回傳的資料
-     response = arduino1.readline().decode().strip()
-     print("Arduino 回應：", response)
+#      # 可選：顯示 Arduino 回傳的資料
+#      response = arduino1.readline().decode().strip()
+#      print("Arduino 回應：", response)
      
-def send_home():
-    arduino1.write(b'HOME\n')
-    print("已送出指令 HOME")
+# def send_home():
+#     arduino1.write(b'HOME\n')
+#     print("已送出指令 HOME")
 
-    arduino2.write(b'HOME\n')
+#     arduino2.write(b'HOME\n')
 
-    response = arduino1.readline().decode().strip()
-    print("Arduino 回應:", response)
+#     response = arduino1.readline().decode().strip()
+#     print("Arduino 回應:", response)
 #Control
 #按鍵建立函數================================================================
 #字體設定
 button_text_style = font.Font(family="Arial", size=12, weight="normal")
 
-start_button = Button(control_label_frame, text="Start", command=send_start, font= button_text_style)
+# start_button = Button(control_label_frame, text="Start", command=send_start, font= button_text_style)
+start_button = Button(control_label_frame, text="Start", command=None, font= button_text_style)
 start_button.grid(padx=10, pady= 10, row=0, column=0, sticky="nsew")
 
 stop_button = Button(control_label_frame, text="Stop", command="None", font= button_text_style)
@@ -119,8 +150,11 @@ stop_button.grid(padx=10, pady= 10, row=1, column=0, sticky="nsew")
 emergency_button = Button(control_label_frame, text="Emergency", command="None", font= button_text_style)
 emergency_button.grid(padx=10, pady= 10, row=2, column=0, sticky="nsew")
 
-home_button = Button(control_label_frame, text="home", command=send_home, font= button_text_style)
+# home_button = Button(control_label_frame, text="home", command=send_home, font= button_text_style)
+home_button = Button(control_label_frame, text="home", command=None, font= button_text_style)
 home_button.grid(padx=10, pady= 10, row=3, column=0, sticky="nsew")
+
+
 
 
 #Process
@@ -205,5 +239,7 @@ console_frame.grid_propagate(False)
 
 
 # # ctrl + /
-
+update_frame()
 window.mainloop()
+cap.release()
+cv2.destroyAllWindows()
