@@ -135,6 +135,20 @@ void loop() {
     }else if(command.equals("UP")){
       Serial.println("up");
       up();
+    }else if(command.equals("OK")){
+      Serial.println("CLAMPING");
+      clip_open();
+      down();
+      clip_close();
+      up();
+      Serial.println("OK");
+    }else if(command.equals("NG")){
+      Serial.println("CLAMPING");
+      clip_open();
+      down();
+      clip_close();
+      up();
+      Serial.println("NG");
     }
   }
     delay(50);

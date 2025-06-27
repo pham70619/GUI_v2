@@ -61,12 +61,17 @@ void loop() {
       Xstart();
       Ystart();
       Zstart();
-      Serial.println("turn");
+      Serial.println("detect");
     }
     else if (command.equals("OK")) {
       Serial.println("OK分類");
-
- 
+      ZfdetectOK();
+      Yreturn();
+    }
+     else if (command.equals("NG")) {
+      Serial.println("NG分類");
+      ZfdetectNG();
+      Yreturn();
     }
   }
   delay(1000);
@@ -139,7 +144,7 @@ void Xreverse() {
 
 void Zreverse() {
   digitalWrite(dirPinZ, HIGH);
-  for (int i = 0; i < 100; i++) {
+  for (int i = 0; i < 150; i++) {
     digitalWrite(stpPinZ, HIGH);
     delayMicroseconds(3000);
     digitalWrite(stpPinZ, LOW);
@@ -156,8 +161,8 @@ void Xstart() {
   }
 }
 void Ystart() {
-  digitalWrite(dirPinX, HIGH);
-  for (int i = 0; i < 900; i++) {
+  digitalWrite(dirPinY, HIGH);
+  for (int i = 0; i < 650; i++) {
     digitalWrite(stpPinY, HIGH);
     delayMicroseconds(3000);
     digitalWrite(stpPinY, LOW);
@@ -166,7 +171,34 @@ void Ystart() {
 }
 void Zstart() {
   digitalWrite(dirPinZ, HIGH);
+  for (int i = 0; i < 240; i++) {
+    digitalWrite(stpPinZ, HIGH);
+    delayMicroseconds(3000);
+    digitalWrite(stpPinZ, LOW);
+    delayMicroseconds(3000);
+  }
+}
+void Yreturn() {
+  digitalWrite(dirPinY, LOW);
+  for (int i = 0; i < 650; i++) {
+    digitalWrite(stpPinY, HIGH);
+    delayMicroseconds(3000);
+    digitalWrite(stpPinY, LOW);
+    delayMicroseconds(3000);
+  }
+}
+void ZfdetectOK() {
+  digitalWrite(dirPinZ, LOW);
   for (int i = 0; i < 200; i++) {
+    digitalWrite(stpPinZ, HIGH);
+    delayMicroseconds(3000);
+    digitalWrite(stpPinZ, LOW);
+    delayMicroseconds(3000);
+  }
+}
+void ZfdetectNG() {
+  digitalWrite(dirPinZ, HIGH);
+  for (int i = 0; i < 650; i++) {
     digitalWrite(stpPinZ, HIGH);
     delayMicroseconds(3000);
     digitalWrite(stpPinZ, LOW);
