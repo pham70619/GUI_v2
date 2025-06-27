@@ -140,6 +140,7 @@ void loop() {
       clip_open();
       down();
       clip_close();
+      time.sleep(0.5)
       up();
       Serial.println("OK");
     }else if(command.equals("NG")){
@@ -147,6 +148,7 @@ void loop() {
       clip_open();
       down();
       clip_close();
+      time.sleep(0.5)
       up();
       Serial.println("NG");
     }
