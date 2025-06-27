@@ -201,29 +201,42 @@ status_label_frame.grid_columnconfigure((0, 1), weight=1) #兩列
 status_label_frame.grid_rowconfigure((0, 1), weight=1) #一行
 
 # #start按鈕函數
-# def send_start():
-#      arduino2.write(b'START\n')  # 傳送 start 指令
-#      print("已傳送指令：start")
+def send_start():
+     arduino2.write(b'START\n')  # 傳送 start 指令
+     print("已傳送指令：start")
     
-#      # 可選：顯示 Arduino 回傳的資料
-#      response = arduino1.readline().decode().strip()
-#      print("Arduino 回應：", response)
+     # 可選：顯示 Arduino 回傳的資料
+     response = arduino1.readline().decode().strip()
+     print("Arduino 回應：", response)
      
-# def send_home():
-#     arduino1.write(b'HOME\n')
-#     print("已送出指令 HOME")
+def send_home():
+     arduino1.write(b'HOME\n')
+     print("已送出指令 HOME")
+     arduino2.write(b'HOME\n')
+     response = arduino1.readline().decode().strip()
+     print("Arduino 回應:", response)
 
-#     arduino2.write(b'HOME\n')
+try:
+    while True:
+        if arduino1.in_waiting > 0:
+            response = arduino1.readline().decode().strip()
+            print(f"收到訊息：{response}")
 
-#     response = arduino1.readline().decode().strip()
-#     print("Arduino 回應:", response)
+            # 判斷是否為 "detect"
+            if response.lower() == "detect":
+                capture_image()
+except KeyboardInterrupt:
+    print("結束程式")
+finally:
+    arduino1.close()
+    
 #Control
 #按鍵建立函數================================================================
 #字體設定
 button_text_style = font.Font(family="Arial", size=12, weight="normal")
 
-# start_button = Button(control_label_frame, text="Start", command=send_start, font= button_text_style)
-start_button = Button(control_label_frame, text="Start", command=capture_image, font= button_text_style)
+start_button = Button(control_label_frame, text="Start", command=send_start, font= button_text_style)
+# start_button = Button(control_label_frame, text="Start", command=capture_image, font= button_text_style)
 start_button.grid(padx=10, pady= 10, row=0, column=0, sticky="nsew")
 
 stop_button = Button(control_label_frame, text="Stop", command="None", font= button_text_style)
@@ -232,8 +245,7 @@ stop_button.grid(padx=10, pady= 10, row=1, column=0, sticky="nsew")
 emergency_button = Button(control_label_frame, text="Emergency", command="None", font= button_text_style)
 emergency_button.grid(padx=10, pady= 10, row=2, column=0, sticky="nsew")
 
-# home_button = Button(control_label_frame, text="home", command=send_home, font= button_text_style)
-home_button = Button(control_label_frame, text="home", command=None, font= button_text_style)
+home_button = Button(control_label_frame, text="home", command=send_home, font= button_text_style)
 home_button.grid(padx=10, pady= 10, row=3, column=0, sticky="nsew")
 
 
