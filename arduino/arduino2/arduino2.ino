@@ -61,7 +61,7 @@ void loop() {
       Xstart();
       Ystart();
       Zstart();
-      Serial.println("detect");
+      Serial.println("DETECT");
     }
     else if (command.equals("OK")) {
       Serial.println("OK分類");

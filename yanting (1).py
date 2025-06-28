@@ -39,7 +39,7 @@ status_lights = []
 
 
 # 定義影像尺寸
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture(0)
 time.sleep(1)
 # cap.set(3, 160)
 # cap.set(4, 120)
@@ -54,7 +54,7 @@ def update_status_light(result):
         status_lights[0][0].itemconfig(status_lights[0][1], fill="white")
         status_lights[1][0].itemconfig(status_lights[1][1], fill="red")
 
-def capture_image():
+def capture_image(command = None, target = None):
     global ok_count, ng_count, total_count, detect_buffer
     # Reset LED
     for canvas, cid in status_lights:
@@ -118,6 +118,14 @@ def capture_image():
             print(f"[Result] FINAL after 2 captures: {result_final}")
             update_status_light(result_final)
             add_log(f"Detect result: {result_final}", level="INFO")
+            
+            # 下發最終結果
+            send_command(arduino2, f"DETECT-{result_final}")
+    
+    # 下發命令給 arduino1 的轉盤
+    if command and target:
+        send_command(target, command)
+
 
 
 main_frame = tk.Frame(window, bg= "#83A6CE")
@@ -200,43 +208,96 @@ result_label_frame.grid_rowconfigure((0, 1, 2, 3, 4, 5), weight=1) #六行
 status_label_frame.grid_columnconfigure((0, 1), weight=1) #兩列
 status_label_frame.grid_rowconfigure((0, 1), weight=1) #一行
 
-# #start按鈕函數
-def send_start():
-     arduino2.write(b'START\n')  # 傳送 start 指令
-     print("已傳送指令：start")
-    
-     # 可選：顯示 Arduino 回傳的資料
-     response = arduino1.readline().decode().strip()
-     print("Arduino 回應：", response)
-     
-def send_home():
-     arduino1.write(b'HOME\n')
-     print("已送出指令 HOME")
-     arduino2.write(b'HOME\n')
-     response = arduino1.readline().decode().strip()
-     print("Arduino 回應:", response)
+# level : INFO; ERROR; WARNING
+def add_log(message, level="INFO"):
+    console_log.config(state="normal")
 
-try:
-    while True:
-        if arduino1.in_waiting > 0:
+    timestamp = datetime.now().strftime("%H:%M:%S")
+    tag = level.upper()
+
+    log_line = f"[{timestamp}] [{tag}] {message}\n"
+    console_log.insert("end", log_line, tag)
+    console_log.see("end")
+    console_log.config(state="disabled")
+
+# 下發命函數
+def send_command(target, command):
+    # 支援target 是個 List
+    targets = target if isinstance(target, list) else [target]
+
+    for arduino in targets:
+        if arduino:
+            try:
+                arduino.write((command + '\n').encode())
+                add_log(f"已傳送指令：{command} 給 {arduino.port}", level="INFO")
+
+            except Exception as e:
+                add_log(f"[{arduino.port}] 發送 {command} 指令時出錯: {e}", level="ERROR")
+        else:
+            add_log(f"目標 Arduino 尚未連接，無法發送 {command} 指令", level="ERROR")
+
+
+#讀取arduino 回傳的訊息
+def read_arduino():
+    # arduino 1
+    if arduino1 and arduino1.in_waiting > 0:
+        try:
             response = arduino1.readline().decode().strip()
-            print(f"收到訊息：{response}")
+            print(f"[Arduino 1] 收到訊息：{response}")
 
-            # 判斷是否為 "detect"
-            if response.lower() == "detect":
+            # 處理回傳的訊息
+            if response.upper() == "TURN OVER":
                 capture_image()
-except KeyboardInterrupt:
-    print("結束程式")
-finally:
-    arduino1.close()
-    
+                
+        except Exception as e:
+            add_log(f"讀取 Arduino1 時發生錯誤: {e}", level="ERROR")
+
+    # arduino 2
+    if arduino2 and arduino2.in_waiting > 0:
+        try:
+            response = arduino2.readline().decode().strip()
+            print(f"[Arduino 2] 收到訊息：{response}")
+
+            # 處理回傳的訊息
+            if response.upper() == "DETECT":
+                capture_image(command="TURN", target=arduino1)
+
+        except Exception as e:
+            add_log(f"讀取 Arduino2 時發生錯誤: {e}", level="ERROR")
+
+# 視窗關閉前處理
+def on_closing():
+    # 中斷連線到arduino1
+    if arduino1:
+        try:
+            arduino1.close()
+            add_log("已關閉 Arduino1", level="INFO")
+        except Exception as e:
+            add_log(f"關閉 Arduino1 時發生錯誤: {e}", level="ERROR")
+
+    # 中斷連線到arduino2
+    if arduino2:
+        try:
+            arduino2.close()
+            add_log("已關閉 Arduino2", level="INFO")
+        except Exception as e:
+            add_log(f"關閉 Arduino2 時發生錯誤: {e}", level="ERROR")
+
+    # 中斷攝影機連線
+    if cap and cap.isOpened():
+        cap.release()
+        add_log("已關閉攝影機", level="INFO")
+
+    # 關閉視窗
+    window.destroy()
+
+
 #Control
 #按鍵建立函數================================================================
 #字體設定
 button_text_style = font.Font(family="Arial", size=12, weight="normal")
 
-start_button = Button(control_label_frame, text="Start", command=send_start, font= button_text_style)
-# start_button = Button(control_label_frame, text="Start", command=capture_image, font= button_text_style)
+start_button = Button(control_label_frame, text="Start", command=lambda: send_command(arduino2, "START"), font= button_text_style)
 start_button.grid(padx=10, pady= 10, row=0, column=0, sticky="nsew")
 
 stop_button = Button(control_label_frame, text="Stop", command="None", font= button_text_style)
@@ -245,7 +306,7 @@ stop_button.grid(padx=10, pady= 10, row=1, column=0, sticky="nsew")
 emergency_button = Button(control_label_frame, text="Emergency", command="None", font= button_text_style)
 emergency_button.grid(padx=10, pady= 10, row=2, column=0, sticky="nsew")
 
-home_button = Button(control_label_frame, text="home", command=send_home, font= button_text_style)
+home_button = Button(control_label_frame, text="home", command=lambda: send_command([arduino1, arduino2], "HOME"), font= button_text_style)
 home_button.grid(padx=10, pady= 10, row=3, column=0, sticky="nsew")
 
 
@@ -276,15 +337,15 @@ results = ["OK", "NG", "Total"]
 background_color = ["#4CE461", "#E44C5E", "#4C9BE4"]
 count_vars = [ok_var, ng_var, total_var]
 
+# create label
 for i, result in enumerate(results):
-    #label
-    result_label = Label(result_label_frame, text=result,background="#83A6CE", font=label_text_style)
+    result_label = Label(result_label_frame, text=result, background="#83A6CE", font=label_text_style)
     result_label.grid(row=0, column=i, padx=25, pady=25, sticky="s")
 
-    #result
-    for i, (color,var) in enumerate(zip(background_color, count_vars)):
-        result = Label(result_label_frame, textvariable=var, background=color, font=result_text_style, fg= "white")
-        result.grid(row=1, column=i, padx=10, pady=10, sticky="nsew")
+# create result
+for i, (color, var) in enumerate(zip(background_color, count_vars)):
+    value_label = Label(result_label_frame, textvariable=var, background=color, font=result_text_style, fg="white")
+    value_label.grid(row=1, column=i, padx=10, pady=10, sticky="nsew")
 
 
 #Status=======================================================================
@@ -304,17 +365,7 @@ for i, label in enumerate(status):
     circle_id = status_light.create_oval(2, 2, 48, 48, fill="white", outline="lightgray")
     status_lights.append((status_light, circle_id))
 
-# level : INFO; ERROR; WARNING
-def add_log(message, level="INFO"):
-    console_log.config(state="normal")
 
-    timestamp = datetime.now().strftime("%H:%M:%S")
-    tag = level.upper()
-
-    log_line = f"[{timestamp}] [{tag}] {message}\n"
-    console_log.insert("end", log_line, tag)
-    console_log.see("end")
-    console_log.config(state="disabled")
 
 try:
     arduino1 = serial.Serial(port='/dev/ttyACM1', baudrate=115200, timeout=1)
@@ -332,6 +383,8 @@ except Exception as e:
 
 
 
+
+
 #尺寸鎖定=====================================================================
 control_label_frame.grid_propagate(False)
 process_label_frame.grid_propagate(False)
@@ -339,6 +392,9 @@ result_label_frame.grid_propagate(False)
 console_frame.grid_propagate(False)
 
 
-# # ctrl + /
+# 啟動讀取arduino 回傳訊息的函數
+window.after(100, read_arduino) #每100 豪秒讀一次
+# 註冊關閉前處理的函數
+window.protocol("WM_DELETE_WINDOW", on_closing)
 
 window.mainloop()
