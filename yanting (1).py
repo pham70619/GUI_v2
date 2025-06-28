@@ -120,7 +120,7 @@ def capture_image(command = None, target = None):
             add_log(f"Detect result: {result_final}", level="INFO")
             
             # 下發最終結果
-            send_command(arduino2, f"DETECT-{result_final}")
+            send_command(arduino1, f"DETECT-{result_final}")
     
     # 下發命令給 arduino1 的轉盤
     if command and target:
@@ -248,7 +248,11 @@ def read_arduino():
             # 處理回傳的訊息
             if response.upper() == "TURN OVER":
                 capture_image()
-                
+            elif response.upper() == "CLAMP-OK":
+             send_command(arduino2, "OK")
+            elif response.upper() == "CLAMP-NG":
+             send_command(arduino2, "NG")
+       
         except Exception as e:
             add_log(f"讀取 Arduino1 時發生錯誤: {e}", level="ERROR")
 

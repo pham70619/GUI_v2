@@ -67,11 +67,13 @@ void loop() {
       Serial.println("OK分類");
       ZfdetectOK();
       Yreturn();
+      Serial.println("分類結束");
     }
      else if (command.equals("NG")) {
       Serial.println("NG分類");
       ZfdetectNG();
       Yreturn();
+      Serial.println("[分類結束]");
     }
   }
   delay(1000);
