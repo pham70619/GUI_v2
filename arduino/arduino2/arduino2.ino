@@ -182,7 +182,7 @@ void Zstart() {
 }
 void Yreturn() {
   digitalWrite(dirPinY, LOW);
-  for (int i = 0; i < 650; i++) {
+  for (int i = 0; i < 680; i++) {
     digitalWrite(stpPinY, HIGH);
     delayMicroseconds(3000);
     digitalWrite(stpPinY, LOW);

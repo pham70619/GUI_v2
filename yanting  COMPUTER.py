@@ -372,14 +372,14 @@ for i, label in enumerate(status):
 
 
 try:
-    arduino1 = serial.Serial(port='/dev/ttyACM1', baudrate=115200, timeout=1)
+    arduino1 = serial.Serial(port='COM3', baudrate=115200, timeout=1)
     time.sleep(2)
     add_log("已連接 Arduino1（轉盤與夾爪控制）", level="INFO")
 except Exception as e:
     add_log(f"無法連接 Arduino1: {e}", level="ERROR")
 
 try:
-    arduino2 = serial.Serial(port='/dev/ttyACM0', baudrate=115200, timeout=1)
+    arduino2 = serial.Serial(port='COM4', baudrate=115200, timeout=1)
     time.sleep(2)
     add_log("已連接 Arduino2（主機構控制）", level="INFO")
 except Exception as e:

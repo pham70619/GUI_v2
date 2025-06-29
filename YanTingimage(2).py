@@ -17,13 +17,13 @@ window.geometry("750x480")
 # 2. 載入 YOLOv8 權重 (papertube.pt)
 #    請確認 papertube.pt 與此程式放在同一層資料夾
 # ----------------------------
-model = YOLO("papertube.pt")  # 只載入這一個模型
+model = YOLO("best.pt")  # 只載入這一個模型
 time.sleep(2)  # 等待模型初始化
 
 # ----------------------------
 # 3. 開啟攝影機
 # ----------------------------
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 # （可視需要設定解析度，例如 640x480）
 # cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
 # cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
