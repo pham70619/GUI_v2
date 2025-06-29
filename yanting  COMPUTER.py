@@ -269,6 +269,8 @@ def read_arduino():
         except Exception as e:
             add_log(f"讀取 Arduino2 時發生錯誤: {e}", level="ERROR")
 
+window.after(100, read_arduino)
+
 # 視窗關閉前處理
 def on_closing():
     # 中斷連線到arduino1
