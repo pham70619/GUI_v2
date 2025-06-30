@@ -242,7 +242,8 @@ def read_arduino():
     # arduino 1
     if arduino1 and arduino1.in_waiting > 0:
         try:
-            response = arduino1.readline().decode().strip()
+            # response = arduino1.readline().decode().strip()
+            response = arduino1.readline().decode('utf-8').rstrip()
             print(f"[Arduino 1] 收到訊息：{response}")
 
             # 處理回傳的訊息
@@ -259,7 +260,8 @@ def read_arduino():
     # arduino 2
     if arduino2 and arduino2.in_waiting > 0:
         try:
-            response = arduino2.readline().decode().strip()
+            # response = arduino2.readline().decode().strip()
+            response = arduino2.readline().decode('utf-8').rstrip()
             print(f"[Arduino 2] 收到訊息：{response}")
 
             # 處理回傳的訊息
@@ -269,7 +271,7 @@ def read_arduino():
         except Exception as e:
             add_log(f"讀取 Arduino2 時發生錯誤: {e}", level="ERROR")
 
-window.after(100, read_arduino)
+
 
 # 視窗關閉前處理
 def on_closing():

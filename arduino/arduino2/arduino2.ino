@@ -95,7 +95,7 @@ void Yhome() {
 }
 
 void Xhome() {
-  digitalWrite(dirPinX, LOW);
+  digitalWrite(dirPinX, HIGH);
   for (int i = 0; i < 1500; i++) {
     if (digitalRead(XlimitSwitch) == HIGH) {
       Serial.println("運行中限位開關被觸發，停止！");
@@ -110,7 +110,7 @@ void Xhome() {
 }
 
 void Zhome() {
-  digitalWrite(dirPinZ, LOW);
+  digitalWrite(dirPinZ, HIGH);
   for (int i = 0; i < 1500; i++) {
     if (digitalRead(ZlimitSwitch) == HIGH) {
       Serial.println("運行中限位開關被觸發，停止！");
@@ -135,7 +135,7 @@ void Yreverse() {
 }
 
 void Xreverse() {
-  digitalWrite(dirPinX, HIGH);
+  digitalWrite(dirPinX, LOW);
   for (int i = 0; i < 100; i++) {
     digitalWrite(stpPinX, HIGH);
     delayMicroseconds(3000);
@@ -145,7 +145,7 @@ void Xreverse() {
 }
 
 void Zreverse() {
-  digitalWrite(dirPinZ, HIGH);
+  digitalWrite(dirPinZ, LOW);
   for (int i = 0; i < 150; i++) {
     digitalWrite(stpPinZ, HIGH);
     delayMicroseconds(3000);
@@ -154,7 +154,7 @@ void Zreverse() {
   }
 }
 void Xstart() {
-  digitalWrite(dirPinX, HIGH);
+  digitalWrite(dirPinX, LOW);
   for (int i = 0; i < 520; i++) {
     digitalWrite(stpPinX, HIGH);
     delayMicroseconds(3000);
@@ -172,7 +172,7 @@ void Ystart() {
   }
 }
 void Zstart() {
-  digitalWrite(dirPinZ, HIGH);
+  digitalWrite(dirPinZ, LOW);
   for (int i = 0; i < 240; i++) {
     digitalWrite(stpPinZ, HIGH);
     delayMicroseconds(3000);
@@ -190,7 +190,7 @@ void Yreturn() {
   }
 }
 void ZfdetectOK() {
-  digitalWrite(dirPinZ, LOW);
+  digitalWrite(dirPinZ, HIGH);
   for (int i = 0; i < 200; i++) {
     digitalWrite(stpPinZ, HIGH);
     delayMicroseconds(3000);
@@ -199,7 +199,7 @@ void ZfdetectOK() {
   }
 }
 void ZfdetectNG() {
-  digitalWrite(dirPinZ, HIGH);
+  digitalWrite(dirPinZ, LOW);
   for (int i = 0; i < 650; i++) {
     digitalWrite(stpPinZ, HIGH);
     delayMicroseconds(3000);
