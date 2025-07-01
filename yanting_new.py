@@ -86,8 +86,7 @@ def update_frame():
         image_label.imgtk = imgtk
 
         current_frame = frame
-    window.after(100, update_frame)
-
+window.after(100, update_frame)
 #格子分割============================================================
 
 #主框架分割
