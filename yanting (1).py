@@ -249,11 +249,11 @@ def read_arduino():
             if response.upper() == "TURN OVER":
                 capture_image()
             elif response.upper() == "CLAMP-OK":
-             update_process_light(2)
-             send_command(arduino2, "OK")
+                update_process_light(2)
+                send_command(arduino2, "OK")
             elif response.upper() == "CLAMP-NG":
-             update_process_light(2)
-             send_command(arduino2, "NG")
+                update_process_light(2)
+                send_command(arduino2, "NG")
        
         except Exception as e:
             add_log(f"讀取 Arduino1 時發生錯誤: {e}", level="ERROR")
@@ -266,35 +266,37 @@ def read_arduino():
 
             # 處理回傳的訊息
             if response.upper() == "DETECT":
+                update_process_light(1)
                 capture_image(command="TURN", target=arduino1)
             elif response.upper() == "分類結束":
-             update_process_light(3)  # 亮 Finish
-             send_command(arduino1, "CLIP_OPEN") 
+                update_process_light(3)
+                send_command(arduino1, "CLIP_OPEN") 
 
         except Exception as e:
             add_log(f"讀取 Arduino2 時發生錯誤: {e}", level="ERROR")
     
     window.after(100, read_arduino)
 
-#寫入txt黨
-def on_closing():
-    # 儲存統計數據到包含 timestamp 的檔名
-    try:
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"Detection_statistics-{timestamp}.txt"
-        with open(filename, "w") as f:
-            f.write(f"統計時間：{timestamp}\n")
-            f.write(f"OK 數量：{ok_count}\n")
-            f.write(f"NG 數量：{ng_count}\n")
-            f.write(f"Total 數量：{total_count}\n")
-        add_log(f"成功將統計資料寫入 {filename}", level="INFO")
-    except Exception as e:
-        add_log(f"寫入統計檔案時發生錯誤: {e}", level="ERROR")
+
+
 
 
 
 # 視窗關閉前處理
 def on_closing():
+    #寫入txt黨
+    try:
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"Detection_statistics-{timestamp}.txt"
+        with open(filename, "w") as f:
+            f.write(f"TIME：{timestamp}\n")
+            f.write(f"OK count：{ok_count}\n")
+            f.write(f"NG count：{ng_count}\n")
+            f.write(f"Total count：{total_count}\n")
+        add_log(f"成功將統計資料寫入 {filename}", level="INFO")
+    except Exception as e:
+        add_log(f"寫入統計檔案時發生錯誤: {e}", level="ERROR")
+
     # 中斷連線到arduino1
     if arduino1:
         try:
@@ -319,13 +321,6 @@ def on_closing():
     # 關閉視窗
     window.destroy()
 
-# 指示燈函數
-def update_process_light(active_index):
-    for i, light in enumerate(process_lights):
-        if i == active_index:
-            light.config(bg="green")
-        else:
-            light.config(bg="white")
 
 
 #Control
@@ -333,7 +328,7 @@ def update_process_light(active_index):
 #字體設定
 button_text_style = font.Font(family="Arial", size=12, weight="normal")
 
-start_button = Button(control_label_frame, text="Start", command=lambda:[update_process_light(0), send_command(arduino2, "START")], font= button_text_style)
+start_button = Button(control_label_frame, text="Start", command=lambda:[update_process_light(0) , send_command(arduino2, "START")], font= button_text_style)
 start_button.grid(padx=10, pady= 10, row=0, column=0, sticky="nsew")
 
 stop_button = Button(control_label_frame, text="Stop", command="None", font= button_text_style)
@@ -342,7 +337,7 @@ stop_button.grid(padx=10, pady= 10, row=1, column=0, sticky="nsew")
 emergency_button = Button(control_label_frame, text="Emergency", command="None", font= button_text_style)
 emergency_button.grid(padx=10, pady= 10, row=2, column=0, sticky="nsew")
 
-home_button = Button(control_label_frame, text="home", command=lambda:[update_process_light(0), send_command([arduino1, arduino2], "HOME")], font= button_text_style)
+home_button = Button(control_label_frame, text="home", command=lambda: send_command([arduino1, arduino2], "HOME"), font= button_text_style)
 home_button.grid(padx=10, pady= 10, row=3, column=0, sticky="nsew")
 
 
@@ -353,18 +348,27 @@ text_style = font.Font(family="Arial", size=12, weight="normal")
 
 steps = ["Moving", "Detection", "Classification", "Finish"]
 
-process_lights = []
+status_lights = []
 
 #建立流程之label
 for i, step in enumerate(steps):  # 4 step
-    # Đèn báo (trái)指示燈 (左)
+    # 前面指示燈 
     light = Label(process_label_frame, bg="white")
     light.grid(row=i, column=0, padx=25, pady=25, sticky="nsew")
+    status_lights.append(light) 
+
 
     # Step label
     step_label = tk.Label(process_label_frame,padx=20, text=step, font=text_style, anchor="w")
     step_label.grid(row=i, column=1, columnspan=5, padx=15, pady=15, sticky="nsew")
 
+# 定義更新指示燈的函數
+def update_process_light(step_index):
+    for i, light in enumerate(status_lights):
+        if i == step_index:
+            light.config(bg="green")  # 當前步驟顯示綠色
+        else:
+            light.config(bg="white")  # 其他步驟恢復白色
 #Result
 #建立結果label================================================================
 #字體設定
