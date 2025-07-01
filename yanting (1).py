@@ -9,6 +9,9 @@ import cv2
 from PIL import Image, ImageTk
 from ultralytics import YOLO
 from datetime import datetime
+from google.oauth2 import service_account
+from googleapiclient.discovery import build
+from googleapiclient.http import MediaFileUpload
 
 
 
@@ -289,13 +292,36 @@ def on_closing():
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         filename = f"Detection_statistics-{timestamp}.txt"
         with open(filename, "w") as f:
-            f.write(f"TIME：{timestamp}\n")
-            f.write(f"OK count：{ok_count}\n")
-            f.write(f"NG count：{ng_count}\n")
-            f.write(f"Total count：{total_count}\n")
-        add_log(f"成功將統計資料寫入 {filename}", level="INFO")
+            f.write(f"時間: {timestamp}\n")
+            f.write(f"OK count: {ok_count}\n")
+            f.write(f"NG count: {ng_count}\n")
+            f.write(f"Total count: {total_count}\n")
+        add_log(f"✅ 成功將統計數據寫入 {filename}", level="INFO")
+
+    # Google Drive 上傳區段
+        credentials_path = "key.json"
+        FOLDER_ID = "1wUL1qKUujBK4lVavyu3FBLlnIF_VI32d"  # 你目前資料夾的 ID
+
+        SCOPES = ['https://www.googleapis.com/auth/drive.file']
+        creds = service_account.Credentials.from_service_account_file(credentials_path, scopes=SCOPES)
+        service = build('drive', 'v3', credentials=creds)
+
+        file_metadata = {'name': filename, 'parents': [FOLDER_ID]}  # ✅ 改為大寫一致
+        media = MediaFileUpload(filename, resumable=True)
+        uploaded_file = service.files().create(
+        body=file_metadata,
+        media_body=media,
+        fields='id'
+         ).execute()
+
+        print("✅ 檔案已成功上傳，ID為：", uploaded_file.get("id")) 
+        add_log(f"☁ 已上傳至 Google Drive（檔案 ID: {uploaded_file.get('id')}）", level="INFO")
     except Exception as e:
-        add_log(f"寫入統計檔案時發生錯誤: {e}", level="ERROR")
+        add_log(f"⚠ 發生錯誤：{e}", level="ERROR")
+ 
+
+
+
 
     # 中斷連線到arduino1
     if arduino1:
