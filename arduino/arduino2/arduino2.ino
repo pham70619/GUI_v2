@@ -73,7 +73,7 @@ void loop() {
       Serial.println("NG分類");
       ZfdetectNG();
       Yreturn();
-      Serial.println("[分類結束]");
+      Serial.println("分類結束");
     }
   }
   delay(1000);
@@ -164,7 +164,7 @@ void Xstart() {
 }
 void Ystart() {
   digitalWrite(dirPinY, HIGH);
-  for (int i = 0; i < 650; i++) {
+  for (int i = 0; i < 670; i++) {
     digitalWrite(stpPinY, HIGH);
     delayMicroseconds(3000);
     digitalWrite(stpPinY, LOW);

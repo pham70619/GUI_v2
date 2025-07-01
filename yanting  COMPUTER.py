@@ -120,7 +120,7 @@ def capture_image(command = None, target = None):
             add_log(f"Detect result: {result_final}", level="INFO")
             
             # 下發最終結果
-            send_command(arduino1, f"DETECT-{result_final}")
+            send_command(arduino1, f"DETECT{result_final}")
     
     # 下發命令給 arduino1 的轉盤
     if command and target:
@@ -242,8 +242,8 @@ def read_arduino():
     # arduino 1
     if arduino1 and arduino1.in_waiting > 0:
         try:
-            # response = arduino1.readline().decode().strip()
-            response = arduino1.readline().decode('utf-8').rstrip()
+            response = arduino1.readline().decode().strip()
+            # response = arduino1.readline().decode('utf-8').rstrip()
             print(f"[Arduino 1] 收到訊息：{response}")
 
             # 處理回傳的訊息
@@ -260,18 +260,20 @@ def read_arduino():
     # arduino 2
     if arduino2 and arduino2.in_waiting > 0:
         try:
-            # response = arduino2.readline().decode().strip()
-            response = arduino2.readline().decode('utf-8').rstrip()
+            response = arduino2.readline().decode().strip()
+            # response = arduino2.readline().decode('utf-8').rstrip()
             print(f"[Arduino 2] 收到訊息：{response}")
 
             # 處理回傳的訊息
             if response.upper() == "DETECT":
                 capture_image(command="TURN", target=arduino1)
+            elif response.upper() == "分類結束":
+             send_command(arduino1, "CLIP_OPEN") 
 
         except Exception as e:
             add_log(f"讀取 Arduino2 時發生錯誤: {e}", level="ERROR")
 
-
+    window.after(100, read_arduino)
 
 # 視窗關閉前處理
 def on_closing():
@@ -298,6 +300,7 @@ def on_closing():
 
     # 關閉視窗
     window.destroy()
+
 
 
 #Control

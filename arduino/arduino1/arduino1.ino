@@ -91,7 +91,7 @@ void clip_open(){
 void down(){
   Serial.println("downing...");
   digitalWrite(dirPinZ, LOW);
-  for (int i = 0; i < 250; i++) {
+  for (int i = 0; i < 280; i++) {
     digitalWrite(stpPinZ, HIGH);
     delayMicroseconds(3000);
     digitalWrite(stpPinZ, LOW);
@@ -135,18 +135,24 @@ void loop() {
     }else if(command.equals("UP")){
       Serial.println("up");
       up();
-    }else if(command.equals("DETECT-OK")){
+    }else if(command.equals("DETECTOK")){
       Serial.println("CLAMPING");
       clip_open();
       down();
+      delay(1000); 
       clip_close();
+      delay(1000); 
       up();
+      delay(1000); 
       Serial.println("CLAMP-OK");
-    }else if(command.equals("DETECT-NG")){
+    }else if(command.equals("DETECTNG")){
       Serial.println("CLAMPING");
       clip_open();
+      delay(1000); 
       down();
+      delay(1000); 
       clip_close();
+      delay(1000); 
       up();
       Serial.println("CLAMP-NG");
     }
