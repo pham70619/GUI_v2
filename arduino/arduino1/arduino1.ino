@@ -135,7 +135,7 @@ void loop() {
     }else if(command.equals("UP")){
       Serial.println("up");
       up();
-    }else if(command.equals("DETECTOK")){
+    }else if(command.equals("DETECT-OK")){
       Serial.println("CLAMPING");
       clip_open();
       down();
@@ -145,7 +145,7 @@ void loop() {
       up();
       delay(1000); 
       Serial.println("CLAMP-OK");
-    }else if(command.equals("DETECTNG")){
+    }else if(command.equals("DETECT-NG")){
       Serial.println("CLAMPING");
       clip_open();
       delay(1000); 

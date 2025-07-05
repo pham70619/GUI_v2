@@ -374,14 +374,14 @@ text_style = font.Font(family="Arial", size=12, weight="normal")
 
 steps = ["Moving", "Detection", "Classification", "Finish"]
 
-process_lights = [] 
+process_lights = []
 
 #建立流程之label
 for i, step in enumerate(steps):  # 4 step
     # 前面指示燈 
     light = Label(process_label_frame, bg="white")
     light.grid(row=i, column=0, padx=25, pady=25, sticky="nsew")
-    process_lights.append(light)
+    process_lights.append(light) 
 
 
     # Step label
@@ -392,10 +392,9 @@ for i, step in enumerate(steps):  # 4 step
 def update_process_light(step_index):
     for i, light in enumerate(process_lights):
         if i == step_index:
-            light.config(bg="green")
+            light.config(bg="green")  # 當前步驟顯示綠色
         else:
-            light.config(bg="white")
-
+            light.config(bg="white")  # 其他步驟恢復白色
 #Result
 #建立結果label================================================================
 #字體設定
