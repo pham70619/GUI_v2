@@ -47,6 +47,37 @@ time.sleep(1)
 # cap.set(3, 160)
 # cap.set(4, 120)
 
+def export_statistics():
+    try:
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"Detection_statistics-{timestamp}.txt"
+        with open(filename, "w") as f:
+            f.write(f"時間: {timestamp}\n")
+            f.write(f"OK count: {ok_count}\n")
+            f.write(f"NG count: {ng_count}\n")
+            f.write(f"Total count: {total_count}\n")
+        add_log(f"✅ 成功將統計數據寫入 {filename}", level="INFO")
+
+        # Google Drive 上傳
+        credentials_path = "key.json"
+        FOLDER_ID = "1wUL1qKUujBK4lVavyu3FBLlnIF_VI32d"
+
+        SCOPES = ['https://www.googleapis.com/auth/drive.file']
+        creds = service_account.Credentials.from_service_account_file(credentials_path, scopes=SCOPES)
+        service = build('drive', 'v3', credentials=creds)
+
+        file_metadata = {'name': filename, 'parents': [FOLDER_ID]}
+        media = MediaFileUpload(filename, resumable=True)
+        uploaded_file = service.files().create(
+            body=file_metadata,
+            media_body=media,
+            fields='id'
+        ).execute()
+
+        add_log(f"☁ 已上傳至 Google Drive（檔案 ID: {uploaded_file.get('id')}）", level="INFO")
+    except Exception as e:
+        add_log(f"⚠ 發生錯誤：{e}", level="ERROR")
+
 
 def update_status_light(result):
     # result = "OK" 或 "NG"
@@ -287,43 +318,7 @@ def read_arduino():
 
 # 視窗關閉前處理
 def on_closing():
-    #寫入txt黨
-    try:
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"Detection_statistics-{timestamp}.txt"
-        with open(filename, "w") as f:
-            f.write(f"時間: {timestamp}\n")
-            f.write(f"OK count: {ok_count}\n")
-            f.write(f"NG count: {ng_count}\n")
-            f.write(f"Total count: {total_count}\n")
-        add_log(f"✅ 成功將統計數據寫入 {filename}", level="INFO")
-
-    # Google Drive 上傳區段
-        credentials_path = "key.json"
-        FOLDER_ID = "1wUL1qKUujBK4lVavyu3FBLlnIF_VI32d"  # 你目前資料夾的 ID
-
-        SCOPES = ['https://www.googleapis.com/auth/drive.file']
-        creds = service_account.Credentials.from_service_account_file(credentials_path, scopes=SCOPES)
-        service = build('drive', 'v3', credentials=creds)
-
-        file_metadata = {'name': filename, 'parents': [FOLDER_ID]}  # ✅ 改為大寫一致
-        media = MediaFileUpload(filename, resumable=True)
-        uploaded_file = service.files().create(
-        body=file_metadata,
-        media_body=media,
-        fields='id'
-         ).execute()
-
-        print("✅ 檔案已成功上傳，ID為：", uploaded_file.get("id")) 
-        add_log(f"☁ 已上傳至 Google Drive（檔案 ID: {uploaded_file.get('id')}）", level="INFO")
-    except Exception as e:
-        add_log(f"⚠ 發生錯誤：{e}", level="ERROR")
- 
-
-
-
-
-    # 中斷連線到arduino1
+     # 中斷連線到arduino1
     if arduino1:
         try:
             arduino1.close()
@@ -357,14 +352,14 @@ button_text_style = font.Font(family="Arial", size=12, weight="normal")
 start_button = Button(control_label_frame, text="Start", command=lambda:[update_process_light(0) , send_command(arduino2, "START")], font= button_text_style)
 start_button.grid(padx=10, pady= 10, row=0, column=0, sticky="nsew")
 
-stop_button = Button(control_label_frame, text="Stop", command="None", font= button_text_style)
-stop_button.grid(padx=10, pady= 10, row=1, column=0, sticky="nsew")
+Export_button = Button(control_label_frame, text="Export", command=export_statistics, font=button_text_style)
+Export_button.grid(padx=10, pady= 10, row=1, column=0, sticky="nsew")
 
-emergency_button = Button(control_label_frame, text="Emergency", command="None", font= button_text_style)
-emergency_button.grid(padx=10, pady= 10, row=2, column=0, sticky="nsew")
+# emergency_button = Button(control_label_frame, text="Emergency", command="None", font= button_text_style)
+# emergency_button.grid(padx=10, pady= 10, row=2, column=0, sticky="nsew")
 
 home_button = Button(control_label_frame, text="home", command=lambda: send_command([arduino1, arduino2], "HOME"), font= button_text_style)
-home_button.grid(padx=10, pady= 10, row=3, column=0, sticky="nsew")
+home_button.grid(padx=10, pady= 10, row=2, column=0, sticky="nsew")
 
 
 #Process
