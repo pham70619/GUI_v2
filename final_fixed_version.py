@@ -42,7 +42,7 @@ status_lights = []
 
 
 # 定義影像尺寸
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 time.sleep(1)
 
 paperTube = YOLO("best.pt")
@@ -307,7 +307,7 @@ def read_arduino():
                 capture_image(command="TURN", target=arduino1)
             elif response.upper() == "分類結束":
                 update_process_light(3)
-                send_command(arduino1, "CLIP_OPEN") 
+                send_command(arduino1, "TAKE DOWN") 
 
         except Exception as e:
             add_log(f"讀取 Arduino2 時發生錯誤: {e}", level="ERROR")

@@ -173,7 +173,7 @@ void Ystart() {
 }
 void Zstart() {
   digitalWrite(dirPinZ, LOW);
-  for (int i = 0; i < 240; i++) {
+  for (int i = 0; i < 260; i++) {
     digitalWrite(stpPinZ, HIGH);
     delayMicroseconds(3000);
     digitalWrite(stpPinZ, LOW);
@@ -191,7 +191,7 @@ void Yreturn() {
 }
 void ZfdetectOK() {
   digitalWrite(dirPinZ, HIGH);
-  for (int i = 0; i < 200; i++) {
+  for (int i = 0; i < 220; i++) {
     digitalWrite(stpPinZ, HIGH);
     delayMicroseconds(3000);
     digitalWrite(stpPinZ, LOW);
@@ -200,7 +200,7 @@ void ZfdetectOK() {
 }
 void ZfdetectNG() {
   digitalWrite(dirPinZ, LOW);
-  for (int i = 0; i < 650; i++) {
+  for (int i = 0; i < 630; i++) {
     digitalWrite(stpPinZ, HIGH);
     delayMicroseconds(3000);
     digitalWrite(stpPinZ, LOW);

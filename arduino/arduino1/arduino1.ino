@@ -155,6 +155,10 @@ void loop() {
       delay(1000); 
       up();
       Serial.println("CLAMP-NG");
+    }else if(command.equals("TAKE DOWN")){
+      down();
+      delay(1000);
+      clip_open();
     }
   }
     delay(50);
