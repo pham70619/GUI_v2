@@ -95,7 +95,7 @@ void Yhome() {
 }
 
 void Xhome() {
-  digitalWrite(dirPinX, HIGH);
+  digitalWrite(dirPinX, LOW);
   for (int i = 0; i < 1500; i++) {
     if (digitalRead(XlimitSwitch) == HIGH) {
       Serial.println("運行中限位開關被觸發，停止！");
@@ -135,7 +135,7 @@ void Yreverse() {
 }
 
 void Xreverse() {
-  digitalWrite(dirPinX, LOW);
+  digitalWrite(dirPinX, HIGH);
   for (int i = 0; i < 100; i++) {
     digitalWrite(stpPinX, HIGH);
     delayMicroseconds(3000);
@@ -154,7 +154,7 @@ void Zreverse() {
   }
 }
 void Xstart() {
-  digitalWrite(dirPinX, LOW);
+  digitalWrite(dirPinX, HIGH);
   for (int i = 0; i < 520; i++) {
     digitalWrite(stpPinX, HIGH);
     delayMicroseconds(3000);
