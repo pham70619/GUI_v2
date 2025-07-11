@@ -20,7 +20,7 @@ window = tk.Tk()
 window.title("classifier")
 window.geometry("750x480")
 
-paperTube = YOLO("best.pt")
+
 
 # 轉盤跟夾抓控制板
 
@@ -42,10 +42,11 @@ status_lights = []
 
 
 # 定義影像尺寸
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture(0)
 time.sleep(1)
-# cap.set(3, 160)
-# cap.set(4, 120)
+
+paperTube = YOLO("best.pt")
+
 
 def export_statistics():
     try:
@@ -207,7 +208,7 @@ image_label.place(x=0, y=0)
 console_frame = tk.LabelFrame(result_label_frame, text="Console Log", background="#83A6CE")
 console_frame.grid(row=4, rowspan=2, column=0, columnspan=3,  padx=10, pady=10, sticky="nsew")
 
-# # Tạo Text widget cho console log 為控制台日誌建立文字小工具
+# 為控制台日誌建立 Text 元件
 console_log = tk.Text(console_frame, wrap=tk.WORD, state="normal", bg="white",height=1.5)
 console_log.pack(fill="both", expand=True, padx=5, pady=5)
 
@@ -278,6 +279,7 @@ def read_arduino():
         try:
             response = arduino1.readline().decode().strip()
             print(f"[Arduino 1] 收到訊息：{response}")
+            add_log({response})
 
             # 處理回傳的訊息
             if response.upper() == "TURN OVER":
@@ -297,6 +299,7 @@ def read_arduino():
         try:
             response = arduino2.readline().decode().strip()
             print(f"[Arduino 2] 收到訊息：{response}")
+            add_log({response})
 
             # 處理回傳的訊息
             if response.upper() == "DETECT":
@@ -424,7 +427,7 @@ for i, label in enumerate(status):
     status_light = Canvas(status_label_frame, width=50, height=50, bg="#83A6CE", highlightthickness=0)
     status_light.grid(row=0, column=i, padx=10, pady=10)
 
-    # Vẽ hình tròn và lưu lại ID
+    # 繪製圓形並儲存 ID
     circle_id = status_light.create_oval(2, 2, 48, 48, fill="white", outline="lightgray")
     status_lights.append((status_light, circle_id))
 
@@ -443,6 +446,21 @@ try:
     add_log("已連接 Arduino2（主機構控制）", level="INFO")
 except Exception as e:
     add_log(f"無法連接 Arduino2: {e}", level="ERROR")
+
+
+# try:
+#     arduino1 = serial.Serial(port='/dev/ttyACM1', baudrate=115200, timeout=1)
+#     time.sleep(2)
+#     add_log("已連接 Arduino1（轉盤與夾爪控制）", level="INFO")
+# except Exception as e:
+#     add_log(f"無法連接 Arduino1: {e}", level="ERROR")
+
+# try:
+#     arduino2 = serial.Serial(port='/dev/ttyACM0', baudrate=115200, timeout=1)
+#     time.sleep(2)
+#     add_log("已連接 Arduino2（主機構控制）", level="INFO")
+# except Exception as e:
+#     add_log(f"無法連接 Arduino2: {e}", level="ERROR")
 
 
 
